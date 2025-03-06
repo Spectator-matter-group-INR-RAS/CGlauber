@@ -1,6 +1,6 @@
 /*
 * COLA Wrapper for CERN ROOT's TGlauber implementation of Glauber model
-* Copyright (C) 2024 Savva Savenkov
+* Copyright (C) 2024-2025 Savva Savenkov
 * 
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -198,18 +198,18 @@ CGlauberGenerator::CGlauberGenerator(const std::string& NA, const std::string& N
     pdgCodeB = cola::AZToPdg(AZB);
     
     if (isCollider) {
-        pZA =    pow(E*E*0.25 - gconst::nucleonAverMass*gconst::nucleonAverMass,0.5);
-        pZB = -1*pow(E*E*0.25 - gconst::nucleonAverMass*gconst::nucleonAverMass,0.5);
+        pZA = pow(E*E*0.25 - gconst::nucleonAverMass*gconst::nucleonAverMass, 0.5);
+        pZB = -1 * pZA;
         energy = (E/2.0 - gconst::nucleonAverMass);
         sNN = E;
     } else {
-        pZA = pow(E*(E+2*gconst::nucleonAverMass),0.5);
+        pZA = pow(E*(E+2*gconst::nucleonAverMass) + gconst::nucleonAverMass*gconst::nucleonAverMass, 0.5);
         pZB = 0;
         energy = E;
         sNN = pow(2*gconst::nucleonAverMass*gconst::nucleonAverMass+2*E*gconst::nucleonAverMass, 0.5);
     }
 
-    double enAtRest = isCollider ? sNN*sNN / 2 / gconst::nucleonAverMass - gconst::nucleonAverMass : E;
+    double enAtRest = isCollider ? sNN*sNN / 2 / gconst::nucleonAverMass - 2*gconst::nucleonAverMass : E;
     if(enAtRest < 425*gconst::GeV){
         const std::map<double, double> bystricky = {{0.28, 0.027},
                                                     {0.29, 0.051},

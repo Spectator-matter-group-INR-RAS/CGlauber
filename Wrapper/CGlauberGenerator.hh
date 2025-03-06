@@ -1,6 +1,6 @@
 /*
 * COLA Wrapper for CERN ROOT's TGlauber implementation of Glauber model
-* Copyright (C) 2024 Savva Savenkov
+* Copyright (C) 2024-2025 Savva Savenkov
 * 
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
@@ -34,8 +34,8 @@ private:
     int pdgCodeB;
     double pZA;
     double pZB;
-    double energy;
-    double sNN;
+    double energy;      //kinetic
+    double sNN;         //in fact sqrt(sNN)
     double xSectNN;
 
     std::unique_ptr<TGlauberMC> generator;

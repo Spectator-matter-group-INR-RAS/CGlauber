@@ -1,6 +1,6 @@
 /*
 * COLA Wrapper for CERN ROOT's TGlauber implementation of Glauber model
-* Copyright (C) 2025  Savva Savenkov
+* Copyright (C) 2024-2025  Savva Savenkov
 * 
 * This program is free software: you can redistribute it and/or modify
 * it under the terms of the GNU General Public License as published by
