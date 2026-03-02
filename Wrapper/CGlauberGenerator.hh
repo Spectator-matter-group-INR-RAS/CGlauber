@@ -30,6 +30,8 @@
 
 class CGlauberGenerator final: public cola::VGenerator{
 private:
+
+    bool isCollider;
     int pdgCodeA;
     int pdgCodeB;
     double pZA;

@@ -168,7 +168,7 @@ std::unique_ptr<cola::EventData> CGlauberGenerator::operator()() {
                 pdgCodeB,
                 pZA,
                 pZB,
-                energy,
+                isCollider ? sNN : energy,
                 static_cast<float>(xSectNN),
                 static_cast<float>(generator->GetB()),
                 generator->GetNcoll(),
@@ -189,7 +189,7 @@ std::unique_ptr<cola::EventData> CGlauberGenerator::operator()() {
 }
 
 CGlauberGenerator::CGlauberGenerator(const std::string& NA, const std::string& NB, double E, const bool isCollider,
-                                     std::unique_ptr<FermiMomentum>&& fermiMomentum) : fermiMomentum(std::move(fermiMomentum)) {
+                                     std::unique_ptr<FermiMomentum>&& fermiMomentum) : isCollider(isCollider), fermiMomentum(std::move(fermiMomentum)) {
     E *= gconst::GeV;
 
     cola::AZ AZA = DefinedIons(NA);
