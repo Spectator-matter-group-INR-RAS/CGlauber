@@ -53,6 +53,18 @@ cola::AZ DefinedIons(const std::string& name) {
         return {16, 8};	// WS parameterization
     else if (name == "Oho")
         return {16, 8};	// Harmonic oscillator parameterization
+    else if(name == "Ne")
+	    return {20, 10};
+    else if(name == "Ne22")
+	    return {22, 10};
+    else if(name == "Necl")
+    	return {20, 10};
+    else if(name == "Ne22cl")
+    	return {22, 10};
+    else if(name == "Nepgcm")
+    	return {20, 10};
+    else if(name == "Nenleft")
+    	return {20, 10};
     else if (name == "Al")
         return {27, 13};
     else if (name == "Si")
