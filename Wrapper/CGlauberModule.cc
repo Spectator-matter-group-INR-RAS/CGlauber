@@ -16,10 +16,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CGLAUBER_CGLAUBERMODULE_HH
-#define CGLAUBER_CGLAUBERMODULE_HH
+#include "CGlauberModule.hh"
 
-#include "CGlauberFactory.hh"
-#include "CGlauberGenerator.hh"
-
-#endif  // CGLAUBER_CGLAUBERMODULE_HH
+extern "C" cola::VModule* LoadCOLAModule() { return new cola::CGlauberModule(); }

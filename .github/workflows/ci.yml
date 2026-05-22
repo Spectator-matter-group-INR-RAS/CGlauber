@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, dev]
+  pull_request:
+    types: [opened, synchronize, reopened]
+    branches: [main, master, dev]
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+    branches: [main, master, dev]
+
+jobs:
+  ci:
+    name: CI (macos - clang)
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout CGlauber
+        uses: actions/checkout@v6
+
+      - name: Checkout COLA
+        uses: actions/checkout@v6
+        with:
+          repository: ZakayZ/COLA
+          ref: tidy
+          path: COLA
+
+      - name: Install dependencies
+        run: |
+          brew install cmake googletest root coreutils llvm
+          python3 -m pip install cmake-format pyyaml --break-system-packages
+          echo "$(brew --prefix coreutils)/libexec/gnubin" >> "$GITHUB_PATH"
+          echo "$(brew --prefix llvm)/bin" >> "$GITHUB_PATH"
+
+      - name: Build and install COLA
+        working-directory: COLA
+        run: |
+          cmake --preset release
+          cmake --build --preset release --parallel "$(nproc)"
+          sudo cmake --install build/release
+
+      - name: Build and test CGlauber
+        run: |
+          export CMAKE_BUILD_PARALLEL_LEVEL="$(nproc)"
+          cmake --workflow release-test
+
+      - name: Clang-tidy
+        id: clang-tidy
+        run: |
+          export CMAKE_BUILD_PARALLEL_LEVEL="$(nproc)"
+          cmake --workflow test
+
+      - name: Check formatting
+        id: check-format
+        if: always()
+        run: cmake --workflow check-format
