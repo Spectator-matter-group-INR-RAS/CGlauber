@@ -44,7 +44,7 @@ std::unique_ptr<cola::VFilter> CGlauberFactory::Create(const std::unordered_map<
     std::cout << "No Fermi momentum option specified\nProceeding with default option: Goldhaber\n";
     fermiMomentum = std::make_unique<GoldhaberMomentum>();
   }
-  if (auto it = metaData.find("is_colider"); it != metaData.end()) {
+  if (auto it = metaData.find("is_collider"); it != metaData.end()) {
     is_collider = std::stoi(it->second);
   } else {
     std::cout << "Geometry is not specified\nProceeding with default option: collider\n";
