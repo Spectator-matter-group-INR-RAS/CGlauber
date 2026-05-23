@@ -84,12 +84,10 @@ set_target_properties(
                INSTALL_RPATH_USE_LINK_PATH TRUE
 )
 
-if (BUILD_TESTING)
-    set(CGLAUBER_DATA_DIR "${PROJECT_SOURCE_DIR}/data/")
-else ()
-    set(CGLAUBER_DATA_DIR "${CMAKE_INSTALL_PREFIX}/data/${COLA_MODULE_NAME}/")
-endif ()
-target_compile_definitions(${COLA_MODULE_NAME} PRIVATE DATA_INSTALL="${CGLAUBER_DATA_DIR}")
+# Add installation path for library to find .dat files:
+target_compile_definitions(
+    ${COLA_MODULE_NAME} PRIVATE DATA_INSTALL="${CMAKE_INSTALL_PREFIX}/data/${COLA_MODULE_NAME}/"
+)
 
 configure_package_config_file(
     "${PROJECT_SOURCE_DIR}/cmake/CGlauberConfig.cmake.in"
