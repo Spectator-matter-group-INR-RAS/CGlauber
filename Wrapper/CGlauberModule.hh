@@ -16,30 +16,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef CGLAUBER_CGLAUBERFACTORY_HH
-#define CGLAUBER_CGLAUBERFACTORY_HH
+#ifndef CGLAUBER_CGLAUBERMODULE_HH
+#define CGLAUBER_CGLAUBERMODULE_HH
 
+#include "CGlauberFactory.hh"
 #include "CGlauberGenerator.hh"
 #include "COLA.hh"
 
 namespace cola {
-
-  class CGlauberFactory final : public cola::VGeneratorFactory {
-   public:
-    std::unique_ptr<cola::VFilter> Create(const std::unordered_map<std::string, std::string>& metaData) override;
-
-    const std::string& GetFilterName() const override {
-      static const std::string name{"G4DeexcitationHandler"};
-      return name;
-    }
-
-   private:
-    std::optional<double> energy;
-    std::optional<bool> is_collider;
-    std::optional<std::string> name_a;
-    std::optional<std::string> name_b;
-  };
-
+  using CGlauberModule = GenericModule<CGlauberFactory>;
 }  // namespace cola
 
-#endif  // CGLAUBER_CGLAUBERFACTORY_HH
+#endif  // CGLAUBER_CGLAUBERMODULE_HH
