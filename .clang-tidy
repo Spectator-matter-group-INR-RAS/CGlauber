@@ -2,7 +2,7 @@
 ---
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
-ExcludeHeaderFilterRegex: '^(.*/)?tinyxml2/.*'
+ExcludeHeaderFilterRegex: '^(.*/)?TGlauber/.*'
 FormatStyle: 'file'
 UseColor: true
 SystemHeaders: false

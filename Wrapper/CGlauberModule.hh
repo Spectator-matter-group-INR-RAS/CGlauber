@@ -20,11 +20,13 @@
 #define CGLAUBER_CGLAUBERMODULE_HH
 
 #include "CGlauberFactory.hh"
-#include "CGlauberGenerator.hh"
-#include "COLA.hh"
+
+#include <COLA.hh>
 
 namespace cola {
+
   using CGlauberModule = GenericModule<CGlauberFactory>;
+
 }  // namespace cola
 
 #endif  // CGLAUBER_CGLAUBERMODULE_HH

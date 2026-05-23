@@ -20,9 +20,9 @@
 #define CGLAUBER_GLAUBERCONST_H
 
 namespace gconst {
-  constexpr double GeV = 1e3;  // Conversion from GeV to MeV for TGlauber
-  constexpr double nucleonAverMass = 0.93891875434 * GeV;
-  constexpr double pi = 3.14159265358979323846;
+  constexpr double kGeV = 1e3;  // Conversion from GeV to MeV for TGlauber
+  constexpr double kNucleonAverMass = 0.93891875434 * kGeV;
+  constexpr double kPi = 3.14159265358979323846;
 }  // namespace gconst
 
 #endif  // CGLAUBER_GLAUBERCONST_H

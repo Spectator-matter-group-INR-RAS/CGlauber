@@ -2,7 +2,7 @@
     "version": 6,
     "cmakeMinimumRequired": {
         "major": 3,
-        "minor": 14,
+        "minor": 22,
         "patch": 0
     },
     "configurePresets": [
@@ -118,13 +118,19 @@
             "name": "check-format",
             "displayName": "Check all linters",
             "configurePreset": "tidy",
-            "targets": ["clang-format-check", "cmake-format-check"]
+            "targets": [
+                "clang-format-check",
+                "cmake-format-check"
+            ]
         },
         {
             "name": "fix-format",
             "displayName": "Fix all linters",
             "configurePreset": "tidy",
-            "targets": ["clang-format-fix", "cmake-format-fix"]
+            "targets": [
+                "clang-format-fix",
+                "cmake-format-fix"
+            ]
         }
     ],
     "testPresets": [
@@ -162,7 +168,7 @@
         },
         {
             "name": "test",
-            "displayName": "Clang-tidy workflow",
+            "displayName": "Test Workflow (with linter checks)",
             "steps": [
                 {
                     "type": "configure",

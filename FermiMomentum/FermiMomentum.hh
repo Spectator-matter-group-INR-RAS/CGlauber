@@ -25,45 +25,44 @@
 #include <cmath>
 #include <random>
 
-// base class for distributions
 class FermiMomentum {
  public:
-  FermiMomentum() : engine(std::random_device()()), phi(0, 2 * gconst::pi), theta(-1, 1), normal() {}
+  FermiMomentum() : engine_(std::random_device()()), phi_(0, 2 * gconst::kPi), theta_(-1, 1) {}
   virtual ~FermiMomentum() = default;
 
-  cola::LorentzVector getMomentum(int A, int NPart) { return randRotate(momentumMagn(A, NPart)); }
+  cola::LorentzVector GetMomentum(int a, int n_part) { return RandRotate(MomentumMagn(a, n_part)); }
 
  protected:
-  std::mt19937_64 engine;
-  std::uniform_real_distribution<double> phi;
-  std::uniform_real_distribution<double> theta;
-  std::normal_distribution<double> normal;
+  std::mt19937_64 engine_;
+  std::uniform_real_distribution<double> phi_;
+  std::uniform_real_distribution<double> theta_;
+  std::normal_distribution<double> normal_;
 
  private:
-  virtual double momentumMagn(int, int) = 0;
-  cola::LorentzVector randRotate(double);
+  virtual double MomentumMagn(int a, int n_part) = 0;
+  cola::LorentzVector RandRotate(double momentum);
 };
 
-class GoldhaberMomentum : public FermiMomentum {
+class GoldhaberMomentum final : public FermiMomentum {
  private:
-  static constexpr double enParam = 193.;
+  static constexpr double kEnParam = 193.;
 
-  double momentumMagn(int, int) final;
+  double MomentumMagn(int a, int n_part) final;
 };
 
-class MorriseyMomentum : public FermiMomentum {
+class MorriseyMomentum final : public FermiMomentum {
  private:
-  static constexpr double enParam = 150.;
+  static constexpr double kEnParam = 150.;
 
-  double momentumMagn(int, int) final;
+  double MomentumMagn(int a, int n_part) final;
 };
 
-class VanBiberMomentum : public FermiMomentum {
+class VanBiberMomentum final : public FermiMomentum {
  private:
-  static constexpr double enParam1 = 146.;
-  static constexpr double enParam2 = 150.;  // same as Morrisey
+  static constexpr double kEnParam1 = 146.;
+  static constexpr double kEnParam2 = 150.;  // same as Morrisey
 
-  double momentumMagn(int, int) final;
+  double MomentumMagn(int a, int n_part) final;
 };
 
 #endif  // CGLAUBER_FERMIMOMENTUM_HH

@@ -20,194 +20,128 @@
 
 #include "GlauberConst.hh"
 
+#include <cmath>
 #include <map>
+#include <stdexcept>
+#include <unordered_map>
 
-using namespace cola;
+namespace {
 
-cola::AZ DefinedIons(const std::string& name) {
-  if (name == "p")
-    return {1, 1};
-  else if (name == "pg")
-    return {1, 1};
-  else if (name == "pdg")
-    return {1, 1};  // from arXiv:1101.5953
-  else if (name == "dpf")
-    return {2, 1};  // deuteron 2pf (tuned to Hulthen)
-  else if (name == "dh")
-    return {2, 1};  // deuteron Hulthen free
-  else if (name == "d")
-    return {2, 1};  // deuteron Hulthen constrained
-  else if (name == "He3")
-    return {3, 1};  // read configurations from file
-  else if (name == "H3")
-    return {3, 2};  // read configurations from file
-  else if (name == "He4")
-    return {4, 2};  // read configurations from file
-  else if (name == "C")
-    return {12, 6};  // read configurations from file
-  else if (name == "O")
-    return {16, 8};  // read configurations from file
-  else if (name == "O2")
-    return {16, 8};  // read configurations from file
-  else if (name == "Oth")
-    return {16, 8};  // read configurations from file
-  else if (name == "Opar")
-    return {16, 8};  // WS parameterization
-  else if (name == "Oho")
-    return {16, 8};  // Harmonic oscillator parameterization
-  else if (name == "Ne")
-    return {20, 10};
-  else if (name == "Ne22")
-    return {22, 10};
-  else if (name == "Necl")
-    return {20, 10};
-  else if (name == "Ne22cl")
-    return {22, 10};
-  else if (name == "Nepgcm")
-    return {20, 10};
-  else if (name == "Nenleft")
-    return {20, 10};
-  else if (name == "Al")
-    return {27, 13};
-  else if (name == "Si")
-    return {28, 14};
-  else if (name == "Si2")
-    return {28, 14};
-  else if (name == "S")
-    return {32, 16};
-  else if (name == "Ar")
-    return {40, 18};
-  else if (name == "Ca")
-    return {40, 20};
-  else if (name == "Ca2")
-    return {40, 20};  // read configuration from file
-  else if (name == "Ni")
-    return {58, 28};
-  else if (name == "Cu")
-    return {63, 29};
-  else if (name == "Curw ")
-    return {63, 29};
-  else if (name == "Cu2")
-    return {63, 29};
-  else if (name == "Cu2rw")
-    return {63, 29};
-  else if (name == "CuHN")
-    return {63, 29};  // from arXiv:0904.4080v1
-  else if (name == "Br")
-    return {79, 35};  // from the ceiling
-  else if (name == "Ag")
-    return {109, 47};  // from the ceiling
-  else if (name == "Xe")
-    return {129, 54};  // adapted from arXiv:1703.04278
-  else if (name == "Xes")
-    return {129, 54};  // scale from Sb (Antimony, A=122, r=5.32) by 1.019 = (129/122)**0.333
-  else if (name == "Xe2")
-    return {129, 54};  // adapted from arXiv:1703.04278 and Z. Physik (1974) 270: 113
-  else if (name == "Xe2a")
-    return {129, 54};  // ALICE parameters (see public note from 2018 at
-                       // https://cds.cern.ch/collection/ALICE%20Public%20Notes?ln=en)
-  else if (name == "Xerw")
-    return {129, 54};
-  else if (name == "Xesrw")
-    return {129, 54};
-  else if (name == "Xe2arw")
-    return {129, 54};
-  else if (name == "W")
-    return {186, 74};
-  else if (name == "Au")
-    return {197, 79};
-  else if (name == "Aurw")
-    return {197, 79};
-  else if (name == "Au2")
-    return {197, 79};
-  else if (name == "Au2rw")
-    return {197, 79};
-  else if (name == "AuHN")
-    return {197, 79};  // from arXiv:0904.4080v1
-  else if (name == "Pb")
-    return {208, 82};
-  else if (name == "Pbrw")
-    return {208, 82};  // only Pb 207 was tested but should be the same for 208
-  else if (name == "Pb*")
-    return {208, 82};
-  else if (name == "PbHN")
-    return {208, 82};
-  else if (name == "Pbpn")
-    return {208, 82};
-  else if (name == "Pbpnrw")
-    return {208, 82};
-  // Uranium description taken from Heinz & Kuhlman, nucl-th/0411054.  In this code, fR is defined as 6.8*0.91,
-  // fW=6.8*0.26
-  else if (name == "U")
-    return {238, 92};
-  else if (name == "U2")
-    return {238, 92};
-  else
-    throw std::runtime_error("No such ion in CGlauber");
-}
+  cola::AZ DefinedIons(const std::string& name) {
+    static const std::unordered_map<std::string, cola::AZ> k_ion_map = {
+        {"p", {1, 1}},         {"pg", {1, 1}},       {"pdg", {1, 1}},       {"dpf", {2, 1}},      {"dh", {2, 1}},
+        {"d", {2, 1}},         {"He3", {3, 1}},      {"H3", {3, 2}},        {"He4", {4, 2}},      {"C", {12, 6}},
+        {"O", {16, 8}},        {"O2", {16, 8}},      {"Oth", {16, 8}},      {"Opar", {16, 8}},    {"Oho", {16, 8}},
+        {"Ne", {20, 10}},      {"Ne22", {22, 10}},   {"Necl", {20, 10}},    {"Ne22cl", {22, 10}}, {"Nepgcm", {20, 10}},
+        {"Nenleft", {20, 10}}, {"Al", {27, 13}},     {"Si", {28, 14}},      {"Si2", {28, 14}},    {"S", {32, 16}},
+        {"Ar", {40, 18}},      {"Ca", {40, 20}},     {"Ca2", {40, 20}},     {"Ni", {58, 28}},     {"Cu", {63, 29}},
+        {"Curw ", {63, 29}},   {"Cu2", {63, 29}},    {"Cu2rw", {63, 29}},   {"CuHN", {63, 29}},   {"Br", {79, 35}},
+        {"Ag", {109, 47}},     {"Xe", {129, 54}},    {"Xes", {129, 54}},    {"Xe2", {129, 54}},   {"Xe2a", {129, 54}},
+        {"Xerw", {129, 54}},   {"Xesrw", {129, 54}}, {"Xe2arw", {129, 54}}, {"W", {186, 74}},     {"Au", {197, 79}},
+        {"Aurw", {197, 79}},   {"Au2", {197, 79}},   {"Au2rw", {197, 79}},  {"AuHN", {197, 79}},  {"Pb", {208, 82}},
+        {"Pbrw", {208, 82}},   {"Pb*", {208, 82}},   {"PbHN", {208, 82}},   {"Pbpn", {208, 82}},  {"Pbpnrw", {208, 82}},
+        {"U", {238, 92}},      {"U2", {238, 92}},
+    };
+
+    const auto it = k_ion_map.find(name);
+    if (it == k_ion_map.end()) {
+      throw std::runtime_error("No such ion in CGlauber");
+    }
+    return it->second;
+  }
+
+  cola::ParticleClass ParticleClassFromNucleon(const TGlauNucleon* nucleon) {
+    if (nucleon->IsInNucleusA()) {
+      return nucleon->IsSpectator() ? cola::ParticleClass::kSpectatorA : cola::ParticleClass::kNonelasticA;
+    }
+    return nucleon->IsSpectator() ? cola::ParticleClass::kSpectatorB : cola::ParticleClass::kNonelasticB;
+  }
+
+}  // namespace
 
 std::unique_ptr<cola::EventData> CGlauberGenerator::operator()() {
-  generator->Run(1);
-  auto ev = generator->GetEvent();
-  auto tNucleons = generator->GetNucleons();
+  generator_->Run(1);
+  const auto* ev = generator_->GetEvent();
+  auto* t_nucleons = generator_->GetNucleons();
   int nev = 0;
-  if (tNucleons != nullptr) nev = tNucleons->GetEntries();
+  if (t_nucleons != nullptr) {
+    nev = t_nucleons->GetEntries();
+  }
 
-  auto cParticles = cola::EventParticles(nev);
-  auto fMomentumA = fermiMomentum->getMomentum(generator->GetNucleusA()->GetN(), generator->GetNpartA());
-  auto fMomentumB = fermiMomentum->getMomentum(generator->GetNucleusB()->GetN(), generator->GetNpartB());
+  auto c_particles = cola::EventParticles(nev);
+  auto f_momentum_a = fermi_momentum_->GetMomentum(generator_->GetNucleusA()->GetN(), generator_->GetNpartA());
+  auto f_momentum_b = fermi_momentum_->GetMomentum(generator_->GetNucleusB()->GetN(), generator_->GetNpartB());
 
-  double rapidity = std::log(energy + pZA) - std::log(gconst::nucleonAverMass);
+  const double rapidity = std::log(energy_ + p_za_) - std::log(gconst::kNucleonAverMass);
 
-  fMomentumA.BoostAxisRapidity(rapidity);
-  if (pZB != 0) fMomentumB.BoostAxisRapidity(-rapidity);
+  f_momentum_a.BoostAxisRapidity(rapidity);
+  if (p_zb_ != 0) {
+    f_momentum_b.BoostAxisRapidity(-rapidity);
+  }
 
-  for (int i = 0; i < nev; i++) {
-    auto tNucleon = dynamic_cast<TGlauNucleon*>(tNucleons->At(i));
-    cParticles[i] = cola::Particle{
-        0,
-        tNucleon->GetX(),
-        tNucleon->GetY(),
-        tNucleon->GetZ(),
-        tNucleon->IsInNucleusA() ? fMomentumA : fMomentumB,
-        tNucleon->GetType() ? 2212 : 2112,
-        tNucleon->IsInNucleusA()
-            ? (tNucleon->IsSpectator() ? cola::ParticleClass::kSpectatorA : cola::ParticleClass::kNonelasticA)
-            : (tNucleon->IsSpectator() ? cola::ParticleClass::kSpectatorB : cola::ParticleClass::kNonelasticB)};
+  for (int i = 0; i < nev; ++i) {
+    auto* t_nucleon = dynamic_cast<TGlauNucleon*>(t_nucleons->At(i));
+    c_particles[i] = cola::Particle{
+        .position = cola::LorentzVector{.t = 0, .x = t_nucleon->GetX(), .y = t_nucleon->GetY(), .z = t_nucleon->GetZ()},
+        .momentum = t_nucleon->IsInNucleusA() ? f_momentum_a : f_momentum_b,
+        .pdg_code = t_nucleon->GetType() != 0 ? 2212 : 2112,
+        .p_class = ParticleClassFromNucleon(t_nucleon),
+    };
   }
   return std::make_unique<cola::EventData>(cola::EventData{
-      cola::EventIniState{pdgCodeA, pdgCodeB, pZA, pZB, isCollider ? sNN : energy, static_cast<float>(xSectNN),
-                          static_cast<float>(generator->GetB()), generator->GetNcoll(), generator->GetNcollpp(),
-                          generator->GetNcollpn(), generator->GetNcollnn(), generator->GetNpart(),
-                          generator->GetNpartA(), generator->GetNpartB(), ev->PhiA, ev->ThetaA, ev->PhiB, ev->ThetaB,
-                          cParticles},
-      cParticles});
+      .ini_state =
+          cola::EventIniState{
+              .pdg_code_a = pdg_code_a_,
+              .pdg_code_b = pdg_code_b_,
+              .pz_a = p_za_,
+              .pz_b = p_zb_,
+              .energy = is_collider_ ? s_nn_ : energy_,
+              .sect_nn = static_cast<float>(x_sect_nn_),
+              .b = static_cast<float>(generator_->GetB()),
+              .num_coll = generator_->GetNcoll(),
+              .num_coll_pp = generator_->GetNcollpp(),
+              .num_coll_pn = generator_->GetNcollpn(),
+              .num_coll_nn = generator_->GetNcollnn(),
+              .num_part = generator_->GetNpart(),
+              .num_part_a = generator_->GetNpartA(),
+              .num_part_b = generator_->GetNpartB(),
+              .phi_rot_a = ev->PhiA,
+              .theta_rot_a = ev->ThetaA,
+              .phi_rot_b = ev->PhiB,
+              .theta_rot_b = ev->ThetaB,
+              .ini_state_particles = c_particles,
+          },
+      .particles = c_particles,
+  });
 }
 
-CGlauberGenerator::CGlauberGenerator(const std::string& NA, const std::string& NB, double E, const bool isCollider,
-                                     std::unique_ptr<FermiMomentum>&& fermiMomentum)
-    : isCollider(isCollider), fermiMomentum(std::move(fermiMomentum)) {
-  E *= gconst::GeV;
+CGlauberGenerator::CGlauberGenerator(const std::string& name_a, const std::string& name_b, double energy,
+                                     const bool is_collider, std::unique_ptr<FermiMomentum>&& fermi_momentum)
+    : is_collider_(is_collider), fermi_momentum_(std::move(fermi_momentum)) {
+  energy *= gconst::kGeV;
 
-  cola::AZ AZA = DefinedIons(NA);
-  cola::AZ AZB = DefinedIons(NB);
-  pdgCodeA = cola::AZToPdg(AZA);
-  pdgCodeB = cola::AZToPdg(AZB);
+  const cola::AZ aza = DefinedIons(name_a);
+  const cola::AZ azb = DefinedIons(name_b);
+  pdg_code_a_ = cola::AZToPdg(aza);
+  pdg_code_b_ = cola::AZToPdg(azb);
 
-  if (isCollider) {
-    pZA = pow(E * E * 0.25 - gconst::nucleonAverMass * gconst::nucleonAverMass, 0.5);
-    pZB = -1 * pZA;
-    energy = (E / 2.0 - gconst::nucleonAverMass);
-    sNN = E;
+  const double nucleon_mass = gconst::kNucleonAverMass;
+  const double nucleon_mass_sq = nucleon_mass * nucleon_mass;
+
+  if (is_collider_) {
+    p_za_ = std::sqrt(energy * energy * 0.25 - nucleon_mass_sq);
+    p_zb_ = -p_za_;
+    energy_ = energy / 2.0 - nucleon_mass;
+    s_nn_ = energy;
   } else {
-    pZA = pow(E * (E + 2 * gconst::nucleonAverMass) + gconst::nucleonAverMass * gconst::nucleonAverMass, 0.5);
-    pZB = 0;
-    energy = E;
-    sNN = pow(2 * gconst::nucleonAverMass * gconst::nucleonAverMass + 2 * E * gconst::nucleonAverMass, 0.5);
+    p_za_ = std::sqrt(energy * (energy + 2 * nucleon_mass) + nucleon_mass_sq);
+    p_zb_ = 0;
+    energy_ = energy;
+    s_nn_ = std::sqrt(2 * nucleon_mass_sq + 2 * energy * nucleon_mass);
   }
 
-  double enAtRest = isCollider ? sNN * sNN / 2 / gconst::nucleonAverMass - 2 * gconst::nucleonAverMass : E;
-  if (enAtRest < 425 * gconst::GeV) {
+  const double en_at_rest = is_collider_ ? s_nn_ * s_nn_ / 2 / nucleon_mass - 2 * nucleon_mass : energy;
+  if (en_at_rest < 425 * gconst::kGeV) {
     const std::map<double, double> bystricky = {
         {0.28, 0.027},  {0.29, 0.051},  {0.30, 0.082},  {0.31, 0.120},  {0.32, 0.171},  {0.34, 0.321},  {0.36, 0.563},
         {0.38, 0.921},  {0.40, 1.41},   {0.42, 2.05},   {0.44, 2.83},   {0.46, 3.74},   {0.48, 4.76},   {0.50, 5.87},
@@ -222,15 +156,16 @@ CGlauberGenerator::CGlauberGenerator(const std::string& NA, const std::string& N
         {16.0, 30.09},  {18.0, 30.05},  {20.0, 30.00},  {25.0, 29.88},  {30.0, 29.80},  {40.0, 29.78},  {50.0, 29.91},
         {60.0, 30.13},  {70.0, 30.38},  {80.0, 30.66},  {90.0, 30.93},  {100.0, 31.19}, {125.0, 31.78}, {150.0, 32.23},
         {175.0, 32.56}, {200.0, 32.79}, {225.0, 32.92}, {250.0, 32.97}, {275.0, 32.96}, {300.0, 32.89}, {325.0, 32.78},
-        {350.0, 32.63}, {375.0, 32.44}, {400.0, 32.24}, {425.0, 32.01}};  // energy : xsect data
-    auto nextVal = bystricky.lower_bound(enAtRest / gconst::GeV);
-    auto tabVal = nextVal++;
-    double a = (nextVal->second - tabVal->second) / (nextVal->first - tabVal->first);
-    double b = nextVal->second - a * nextVal->first;
-    xSectNN = a * enAtRest / gconst::GeV + b;
+        {350.0, 32.63}, {375.0, 32.44}, {400.0, 32.24}, {425.0, 32.01},
+    };
+    auto next_val = bystricky.lower_bound(en_at_rest / gconst::kGeV);
+    auto tab_val = next_val++;
+    const double slope = (next_val->second - tab_val->second) / (next_val->first - tab_val->first);
+    const double intercept = next_val->second - slope * next_val->first;
+    x_sect_nn_ = slope * en_at_rest / gconst::kGeV + intercept;
   } else {
-    double S = sNN * sNN;
-    xSectNN = 25.0 + 0.146 * pow(log(S / (gconst::GeV * gconst::GeV)), 2);
+    const double mandelstam_s = s_nn_ * s_nn_;
+    x_sect_nn_ = 25.0 + 0.146 * std::pow(std::log(mandelstam_s / (gconst::kGeV * gconst::kGeV)), 2);
   }
-  this->generator = std::make_unique<TGlauberMC>(NA.c_str(), NB.c_str(), xSectNN, -1, time(nullptr));
+  generator_ = std::make_unique<TGlauberMC>(name_a.c_str(), name_b.c_str(), x_sect_nn_, -1, time(nullptr));
 }
