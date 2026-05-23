@@ -29,7 +29,7 @@ namespace cola {
     std::unique_ptr<cola::VFilter> Create(const std::unordered_map<std::string, std::string>& metaData) override;
 
     const std::string& GetFilterName() const override {
-      static const std::string name{"G4DeexcitationHandler"};
+      static const std::string name{"CGlauber"};
       return name;
     }
 
