@@ -87,43 +87,49 @@ set_target_properties(
                INSTALL_RPATH_USE_LINK_PATH TRUE
 )
 
-# Add installation path for library to find .dat files:
-target_compile_definitions(
-    ${COLA_MODULE_NAME} PRIVATE DATA_INSTALL="${CMAKE_INSTALL_PREFIX}/data/${COLA_MODULE_NAME}/"
-)
+# Check for COLA_FETCH_MODE to prevent install instructions from generating and change data path.
+if(NOT COLA_FETCH_MODE)
+    target_compile_definitions(
+        ${COLA_MODULE_NAME} PRIVATE DATA_INSTALL="${CMAKE_INSTALL_PREFIX}/data/${COLA_MODULE_NAME}/"
+    )
 
-configure_package_config_file(
-        "${PROJECT_SOURCE_DIR}/cmake/${COLA_MODULE_NAME}Config.cmake.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/${COLA_MODULE_NAME}Config.cmake"
-        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME}
-)
+    configure_package_config_file(
+            "${PROJECT_SOURCE_DIR}/cmake/${COLA_MODULE_NAME}Config.cmake.in"
+            "${CMAKE_CURRENT_BINARY_DIR}/${COLA_MODULE_NAME}Config.cmake"
+            INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME}
+    )
 
-write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/CGlauberConfigVersion.cmake COMPATIBILITY AnyNewerVersion
-)
+    write_basic_package_version_file(
+        ${CMAKE_CURRENT_BINARY_DIR}/CGlauberConfigVersion.cmake COMPATIBILITY AnyNewerVersion
+    )
 
-# Install library
-install(
-    TARGETS ${COLA_MODULE_NAME}
-    EXPORT CGlauberExport
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/${COLA_MODULE_NAME}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${COLA_MODULE_NAME}
-    INCLUDES
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${COLA_MODULE_NAME}
-)
+    # Install library
+    install(
+        TARGETS ${COLA_MODULE_NAME}
+        EXPORT CGlauberExport
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/${COLA_MODULE_NAME}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${COLA_MODULE_NAME}
+        INCLUDES
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${COLA_MODULE_NAME}
+    )
 
-install(EXPORT CGlauberExport DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME})
+    install(EXPORT CGlauberExport DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME})
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/CGlauberConfig.cmake"
-              "${CMAKE_CURRENT_BINARY_DIR}/CGlauberConfigVersion.cmake"
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME}
-)
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/CGlauberConfig.cmake"
+                "${CMAKE_CURRENT_BINARY_DIR}/CGlauberConfigVersion.cmake"
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME}
+    )
 
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/data/ DESTINATION data/${COLA_MODULE_NAME})
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/data/ DESTINATION data/${COLA_MODULE_NAME})
 
-enable_testing()
-if (BUILD_TESTING)
-    add_subdirectory(tests)
-endif ()
+    enable_testing()
+    if (BUILD_TESTING)
+        add_subdirectory(tests)
+    endif ()
 
-setup_cola_quality_tools(EXCLUDE_PATTERNS ".*/COLA/.*" ".*/TGlauber/.*" ".*/tests/.*")
+    setup_cola_quality_tools(EXCLUDE_PATTERNS ".*/COLA/.*" ".*/TGlauber/.*" ".*/tests/.*")
+else()
+    target_compile_definitions(
+        ${COLA_MODULE_NAME} PRIVATE DATA_INSTALL="${PROJECT_SOURCE_DIR}/data/"
+    )
+endif()
