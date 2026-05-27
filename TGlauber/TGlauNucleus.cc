@@ -461,7 +461,11 @@ TVector3 &TGlauNucleus::ThrowNucleons(Double_t xshift)
 
     // if the first call, then read in the file configurations
     if (fNucCounter == -1) {
+      #ifdef DATA_INSTALL
         std::string filepath(DATA_INSTALL);
+      #else
+        std::string filepath("./data/");
+      #endif
       char filename[100] = "foo.dat";
       if (tmpname=="He3") {
         filepath += "he3_plaintext.dat";

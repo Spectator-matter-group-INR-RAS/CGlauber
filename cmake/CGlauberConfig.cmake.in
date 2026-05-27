@@ -1,6 +1,7 @@
 @PACKAGE_INIT@
 
 include(CMakeFindDependencyMacro)
+
 find_dependency(COLA REQUIRED)
 find_dependency(ROOT REQUIRED)
 

@@ -1,6 +1,6 @@
 /*
  * COLA Wrapper for CERN ROOT's TGlauber implementation of Glauber model
- * Copyright (C) 2024-2025 Savva Savenkov
+ * Copyright (C) 2024-2026 Savva Savenkov
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,20 +19,27 @@
 #ifndef CGLAUBER_CGLAUBERFACTORY_HH
 #define CGLAUBER_CGLAUBERFACTORY_HH
 
-#include <COLA.hh>
+#include "CGlauberGenerator.hh"
+#include "COLA.hh"
 
-#include <memory>
-#include <string>
-#include <unordered_map>
+namespace cola {
 
-class CGlauberFactory final : public cola::VGeneratorFactory {
- public:
-  std::unique_ptr<cola::VFilter> Create(const std::unordered_map<std::string, std::string>& meta_data) final;
+  class CGlauberFactory final : public cola::VGeneratorFactory {
+   public:
+    std::unique_ptr<cola::VFilter> Create(const std::unordered_map<std::string, std::string>& metaData) override;
 
-  const std::string& GetFilterName() const final {
-    static const std::string k_name{"CGlauber"};
-    return k_name;
-  }
-};
+    const std::string& GetFilterName() const override {
+      static const std::string name{"CGlauber"};
+      return name;
+    }
+
+   private:
+    std::optional<double> energy;
+    std::optional<bool> is_collider;
+    std::optional<std::string> name_a;
+    std::optional<std::string> name_b;
+  };
+
+}  // namespace cola
 
 #endif  // CGLAUBER_CGLAUBERFACTORY_HH

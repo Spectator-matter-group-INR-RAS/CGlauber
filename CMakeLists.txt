@@ -1,6 +1,6 @@
 # COLA Wrapper for CERN ROOT's TGlauber implementation of Glauber model
-# Copyright (C) 2024-2025 Savva Savenkov
-#
+# Copyright (C) 2024-2026 Savva Savenkov
+# 
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -25,6 +25,7 @@ project(
 find_package(COLA REQUIRED)
 find_package(ROOT REQUIRED)
 
+include(GNUInstallDirs)
 include(CMakePackageConfigHelpers)
 include(GNUInstallDirs)
 
@@ -55,7 +56,10 @@ target_compile_features(${COLA_MODULE_NAME} PRIVATE cxx_std_17)
 target_include_directories(
     ${COLA_MODULE_NAME}
     PUBLIC
-        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/TGlauber;${PROJECT_SOURCE_DIR}/Wrapper;${PROJECT_SOURCE_DIR}/FermiMomentum;${PROJECT_SOURCE_DIR}>"
+        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/TGlauber>"
+        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/Wrapper>"
+        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/FermiMomentum>"
+        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>"
         $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${COLA_MODULE_NAME}>
 )
 
@@ -64,7 +68,6 @@ target_link_libraries(
 )
 
 set(PROJECT_PUBLIC_HEADERS
-    "Wrapper/CGlauber.hh"
     "Wrapper/CGlauberFactory.hh"
     "Wrapper/CGlauberGenerator.hh"
     "Wrapper/CGlauberModule.hh"
@@ -84,43 +87,49 @@ set_target_properties(
                INSTALL_RPATH_USE_LINK_PATH TRUE
 )
 
-# Add installation path for library to find .dat files:
-target_compile_definitions(
-    ${COLA_MODULE_NAME} PRIVATE DATA_INSTALL="${CMAKE_INSTALL_PREFIX}/data/${COLA_MODULE_NAME}/"
-)
+# Check for COLA_FETCH_MODE to prevent install instructions from generating and change data path.
+if(NOT DEFINED ENV{COLA_FETCH_MODE})
+    target_compile_definitions(
+        ${COLA_MODULE_NAME} PRIVATE DATA_INSTALL="${CMAKE_INSTALL_PREFIX}/data/${COLA_MODULE_NAME}/"
+    )
 
-configure_package_config_file(
-    "${PROJECT_SOURCE_DIR}/cmake/CGlauberConfig.cmake.in"
-    "${CMAKE_CURRENT_BINARY_DIR}/CGlauberConfig.cmake"
-    INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME}
-)
+    configure_package_config_file(
+            "${PROJECT_SOURCE_DIR}/cmake/${COLA_MODULE_NAME}Config.cmake.in"
+            "${CMAKE_CURRENT_BINARY_DIR}/${COLA_MODULE_NAME}Config.cmake"
+            INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME}
+    )
 
-write_basic_package_version_file(
-    ${CMAKE_CURRENT_BINARY_DIR}/CGlauberConfigVersion.cmake COMPATIBILITY AnyNewerVersion
-)
+    write_basic_package_version_file(
+        ${CMAKE_CURRENT_BINARY_DIR}/CGlauberConfigVersion.cmake COMPATIBILITY AnyNewerVersion
+    )
 
-# Install library
-install(
-    TARGETS ${COLA_MODULE_NAME}
-    EXPORT CGlauberExport
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/${COLA_MODULE_NAME}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${COLA_MODULE_NAME}
-    INCLUDES
-    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${COLA_MODULE_NAME}
-)
+    # Install library
+    install(
+        TARGETS ${COLA_MODULE_NAME}
+        EXPORT CGlauberExport
+        LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}/${COLA_MODULE_NAME}
+        PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${COLA_MODULE_NAME}
+        INCLUDES
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/${COLA_MODULE_NAME}
+    )
 
-install(EXPORT CGlauberExport DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME})
+    install(EXPORT CGlauberExport DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME})
 
-install(FILES "${CMAKE_CURRENT_BINARY_DIR}/CGlauberConfig.cmake"
-              "${CMAKE_CURRENT_BINARY_DIR}/CGlauberConfigVersion.cmake"
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME}
-)
+    install(FILES "${CMAKE_CURRENT_BINARY_DIR}/CGlauberConfig.cmake"
+                "${CMAKE_CURRENT_BINARY_DIR}/CGlauberConfigVersion.cmake"
+            DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME}
+    )
 
-install(DIRECTORY ${PROJECT_SOURCE_DIR}/data/ DESTINATION data/${COLA_MODULE_NAME})
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/data/ DESTINATION data/${COLA_MODULE_NAME})
 
-enable_testing()
-if (BUILD_TESTING)
-    add_subdirectory(tests)
-endif ()
+    enable_testing()
+    if (BUILD_TESTING)
+        add_subdirectory(tests)
+    endif ()
 
-setup_cola_quality_tools(EXCLUDE_PATTERNS ".*/COLA/.*" ".*/TGlauber/.*")
+    setup_cola_quality_tools(EXCLUDE_PATTERNS ".*/COLA/.*" ".*/TGlauber/.*" ".*/tests/.*")
+else()
+    target_compile_definitions(
+        ${COLA_MODULE_NAME} PRIVATE DATA_INSTALL="${PROJECT_SOURCE_DIR}/data/"
+    )
+endif()

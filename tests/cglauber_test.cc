@@ -46,14 +46,14 @@ TEST(CGlauberTest, ModuleExposesGeneratorFactory) {
 }
 
 TEST(CGlauberTest, FactoryCreatesGenerator) {
-  CGlauberFactory factory;
+  cola::CGlauberFactory factory;
   const auto filter = factory.Create(DefaultGlauberParams());
   ASSERT_NE(filter, nullptr);
   EXPECT_EQ(factory.GetFilterName(), "CGlauber");
 }
 
 TEST(CGlauberTest, GeneratorProducesNonEmptyEvent) {
-  CGlauberFactory factory;
+  cola::CGlauberFactory factory;
   const auto filter = factory.Create(DefaultGlauberParams());
   auto* generator = dynamic_cast<cola::VGenerator*>(filter.get());
   ASSERT_NE(generator, nullptr);
