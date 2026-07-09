@@ -18,4 +18,6 @@
 
 #include "CGlauberModule.hh"
 
+#include <COLA.hh>
+
 extern "C" cola::VModule* LoadCOLAModule() { return new cola::CGlauberModule(); }

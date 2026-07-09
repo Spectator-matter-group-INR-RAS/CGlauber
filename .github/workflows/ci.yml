@@ -22,8 +22,7 @@ jobs:
       - name: Checkout COLA
         uses: actions/checkout@v6
         with:
-          repository: ZakayZ/COLA
-          ref: tidy
+          repository: Spectator-matter-group-INR-RAS/COLA
           path: COLA
 
       - name: Install dependencies
@@ -45,13 +44,7 @@ jobs:
           export CMAKE_BUILD_PARALLEL_LEVEL="$(nproc)"
           cmake --workflow release-test
 
-      - name: Clang-tidy
-        id: clang-tidy
-        run: |
-          export CMAKE_BUILD_PARALLEL_LEVEL="$(nproc)"
-          cmake --workflow test
-
       - name: Check formatting
         id: check-format
         if: always()
-        run: cmake --workflow check-format
+        run: cmake --workflow format-check

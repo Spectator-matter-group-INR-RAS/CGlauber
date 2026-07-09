@@ -19,11 +19,18 @@
 #include "CGlauberGenerator.hh"
 
 #include "GlauberConst.hh"
+#include "TGlauNucleon.hh"
+
+#include <EventData.hh>
 
 #include <cmath>
+#include <ctime>
 #include <map>
+#include <memory>
 #include <stdexcept>
+#include <string>
 #include <unordered_map>
+#include <utility>
 
 namespace {
 
@@ -134,13 +141,13 @@ CGlauberGenerator::CGlauberGenerator(const std::string& name_a, const std::strin
     energy_ = energy / 2.0 - nucleon_mass;
     s_nn_ = energy;
   } else {
-    p_za_ = std::sqrt(energy * (energy + 2 * nucleon_mass) + nucleon_mass_sq);
+    p_za_ = std::sqrt(energy * (energy + 2 * nucleon_mass));
     p_zb_ = 0;
     energy_ = energy;
     s_nn_ = std::sqrt(2 * nucleon_mass_sq + 2 * energy * nucleon_mass);
   }
 
-  const double en_at_rest = is_collider_ ? s_nn_ * s_nn_ / 2 / nucleon_mass - 2 * nucleon_mass : energy;
+  const double en_at_rest = is_collider_ ? s_nn_ * s_nn_ / 2 / nucleon_mass - nucleon_mass : energy;
   if (en_at_rest < 425 * gconst::kGeV) {
     const std::map<double, double> bystricky = {
         {0.28, 0.027},  {0.29, 0.051},  {0.30, 0.082},  {0.31, 0.120},  {0.32, 0.171},  {0.34, 0.321},  {0.36, 0.563},
