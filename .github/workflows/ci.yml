@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: Checkout CGlauber
         uses: actions/checkout@v6
+        with:
+          path: CGlauber
 
       - name: Checkout COLA
         uses: actions/checkout@v6
@@ -40,11 +42,13 @@ jobs:
           sudo cmake --install build/release
 
       - name: Build and test CGlauber
+        working-directory: CGlauber
         run: |
           export CMAKE_BUILD_PARALLEL_LEVEL="$(nproc)"
           cmake --workflow release-test
 
       - name: Check formatting
+        working-directory: CGlauber
         id: check-format
         if: always()
         run: cmake --workflow format-check
