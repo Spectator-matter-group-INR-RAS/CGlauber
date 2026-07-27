@@ -19,8 +19,9 @@
 #ifndef CGLAUBER_FERMIMOMENTUM_HH
 #define CGLAUBER_FERMIMOMENTUM_HH
 
-#include "COLA.hh"
 #include "GlauberConst.hh"
+
+#include <EventData.hh>
 
 #include <cmath>
 #include <random>

@@ -18,6 +18,12 @@
 
 #include "FermiMomentum.hh"
 
+#include "GlauberConst.hh"
+
+#include <EventData.hh>
+
+#include <cmath>
+
 cola::LorentzVector FermiMomentum::RandRotate(double momentum) {
   const double cos_theta = theta_(engine_);
   const double phi_val = phi_(engine_);

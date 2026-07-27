@@ -19,14 +19,18 @@
 #ifndef CGLAUBER_CGLAUBERFACTORY_HH
 #define CGLAUBER_CGLAUBERFACTORY_HH
 
-#include "CGlauberGenerator.hh"
 #include "COLA.hh"
+
+#include <memory>
+#include <optional>
+#include <string>
+#include <unordered_map>
 
 namespace cola {
 
   class CGlauberFactory final : public cola::VGeneratorFactory {
    public:
-    std::unique_ptr<cola::VFilter> Create(const std::unordered_map<std::string, std::string>& metaData) override;
+    std::unique_ptr<cola::VFilter> Create(const std::unordered_map<std::string, std::string>& meta_data) override;
 
     const std::string& GetFilterName() const override {
       static const std::string name{"CGlauber"};
@@ -34,10 +38,10 @@ namespace cola {
     }
 
    private:
-    std::optional<double> energy;
-    std::optional<bool> is_collider;
-    std::optional<std::string> name_a;
-    std::optional<std::string> name_b;
+    std::optional<double> energy_;
+    std::optional<bool> is_collider_;
+    std::optional<std::string> name_a_;
+    std::optional<std::string> name_b_;
   };
 
 }  // namespace cola
