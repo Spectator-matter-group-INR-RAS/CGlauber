@@ -1,6 +1,6 @@
 # COLA Wrapper for CERN ROOT's TGlauber implementation of Glauber model
 # Copyright (C) 2024-2026 Savva Savenkov
-# 
+#
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -32,11 +32,6 @@ include(GNUInstallDirs)
 set(CMAKE_INSTALL_PREFIX ${COLA_DIR})
 set(COLA_MODULE_NAME CGlauber)
 
-set(COLA_CMAKE_CXX_CLANG_TIDY
-    ""
-    CACHE STRING "Passed to CMAKE_CXX_CLANG_TIDY for ${COLA_MODULE_NAME} targets"
-)
-
 set(WRAPPER_SRCS Wrapper/CGlauberFactory.cc Wrapper/CGlauberGenerator.cc Wrapper/CGlauberModule.cc
                  FermiMomentum/FermiMomentum.cc
 )
@@ -45,22 +40,15 @@ set(VENDOR_SRCS TGlauber/TGlauNucleon.cc TGlauber/TGlauNucleus.cc TGlauber/TGlau
 
 add_library(${COLA_MODULE_NAME} SHARED ${WRAPPER_SRCS} ${VENDOR_SRCS})
 
-if (COLA_CMAKE_CXX_CLANG_TIDY)
-    set_source_files_properties(
-        ${WRAPPER_SRCS} PROPERTIES CXX_CLANG_TIDY "${COLA_CMAKE_CXX_CLANG_TIDY}"
-    )
-endif ()
-
 target_compile_features(${COLA_MODULE_NAME} PRIVATE cxx_std_17)
 
 target_include_directories(
     ${COLA_MODULE_NAME}
-    PUBLIC
-        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/TGlauber>"
-        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/Wrapper>"
-        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/FermiMomentum>"
-        "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>"
-        $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${COLA_MODULE_NAME}>
+    PUBLIC "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/TGlauber>"
+           "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/Wrapper>"
+           "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}/FermiMomentum>"
+           "$<BUILD_INTERFACE:${PROJECT_SOURCE_DIR}>"
+           $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/${COLA_MODULE_NAME}>
 )
 
 target_link_libraries(
@@ -88,15 +76,16 @@ set_target_properties(
 )
 
 # Check for COLA_FETCH_MODE to prevent install instructions from generating and change data path.
-if(NOT DEFINED ENV{COLA_FETCH_MODE})
+if (NOT DEFINED ENV{COLA_FETCH_MODE})
     target_compile_definitions(
-        ${COLA_MODULE_NAME} PRIVATE DATA_INSTALL="${CMAKE_INSTALL_PREFIX}/data/${COLA_MODULE_NAME}/"
+        ${COLA_MODULE_NAME}
+        PRIVATE DATA_INSTALL="${CMAKE_INSTALL_PREFIX}/data/${COLA_MODULE_NAME}/"
     )
 
     configure_package_config_file(
-            "${PROJECT_SOURCE_DIR}/cmake/${COLA_MODULE_NAME}Config.cmake.in"
-            "${CMAKE_CURRENT_BINARY_DIR}/${COLA_MODULE_NAME}Config.cmake"
-            INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME}
+        "${PROJECT_SOURCE_DIR}/cmake/${COLA_MODULE_NAME}Config.cmake.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/${COLA_MODULE_NAME}Config.cmake"
+        INSTALL_DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME}
     )
 
     write_basic_package_version_file(
@@ -116,7 +105,7 @@ if(NOT DEFINED ENV{COLA_FETCH_MODE})
     install(EXPORT CGlauberExport DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME})
 
     install(FILES "${CMAKE_CURRENT_BINARY_DIR}/CGlauberConfig.cmake"
-                "${CMAKE_CURRENT_BINARY_DIR}/CGlauberConfigVersion.cmake"
+                  "${CMAKE_CURRENT_BINARY_DIR}/CGlauberConfigVersion.cmake"
             DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/${COLA_MODULE_NAME}
     )
 
@@ -127,9 +116,9 @@ if(NOT DEFINED ENV{COLA_FETCH_MODE})
         add_subdirectory(tests)
     endif ()
 
-    setup_cola_quality_tools(EXCLUDE_PATTERNS ".*/COLA/.*" ".*/TGlauber/.*" ".*/tests/.*")
-else()
+    setup_cola_quality_tools(EXCLUDE_PATTERNS ".*/TGlauber/.*" ".*/tests/.*")
+else ()
     target_compile_definitions(
         ${COLA_MODULE_NAME} PRIVATE DATA_INSTALL="${PROJECT_SOURCE_DIR}/data/"
     )
-endif()
+endif ()

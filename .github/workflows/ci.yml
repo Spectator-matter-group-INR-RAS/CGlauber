@@ -12,26 +12,100 @@ on:
 
 jobs:
   ci:
-    name: CI (macos - clang)
-    runs-on: macos-latest
+    name: CI (Ubuntu)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      CXX: g++
+      G4_VERSION: v11.4.2
+      G4_INSTALL: /home/runner/.geant4
+      ROOT_LINK: https://root.cern/download/root_v6.40.02.Linux-ubuntu24.04-x86_64-gcc13.3.tar.gz
+      ROOT_VERSION: v6.40.02
+      ROOT_INSTALL: /home/runner/.root
+
 
     steps:
       - name: Checkout CGlauber
         uses: actions/checkout@v6
+        with:
+          path: CGlauber
 
       - name: Checkout COLA
         uses: actions/checkout@v6
         with:
-          repository: ZakayZ/COLA
-          ref: tidy
+          repository: Spectator-matter-group-INR-RAS/COLA
           path: COLA
 
-      - name: Install dependencies
+      - name: Checkout Geant4
+        uses: actions/checkout@v6
+        with:
+          repository: Geant4/geant4
+          ref: ${{ env.G4_VERSION }}
+          path: geant4
+          fetch-depth: 1
+
+      - name: Cache Geant4 build and install
+        uses: actions/cache@v4
+        id: cache-geant
+        with:
+          path: |
+            geant4/build
+            .geant4
+          key: geant4-${{ env.G4_VERSION }}-${{ runner.os }}-v2
+
+      - name: Cache CERN ROOT install
+        id: cache-root
+        uses: actions/cache@v4
+        with:
+          path: .root
+          key: root-${{ env.ROOT_VERSION }}-${{ runner.os }}
+
+      - name: Install build dependencies
         run: |
-          brew install cmake googletest root coreutils llvm
-          python3 -m pip install cmake-format pyyaml --break-system-packages
-          echo "$(brew --prefix coreutils)/libexec/gnubin" >> "$GITHUB_PATH"
-          echo "$(brew --prefix llvm)/bin" >> "$GITHUB_PATH"
+          sudo apt-get update
+          sudo apt-get install -y build-essential cmake \
+            libexpat1-dev zlib1g-dev libgtest-dev g++ clang-format-20 clang-tidy-20 \
+            binutils dpkg-dev libssl-dev git libx11-dev \
+            libxext-dev libxft-dev libxpm-dev python3 libtbb-dev libvdt-dev libgif-dev \
+            gfortran libpcre3-dev libglu1-mesa-dev libglew-dev libftgl-dev \
+            libfftw3-dev libcfitsio-dev libgraphviz-dev libjpeg-dev \
+            libavahi-compat-libdnssd-dev libldap2-dev libgsl-dev \
+            python3-dev python3-numpy libxml2-dev libkrb5-dev \
+            libgsl-dev qtwebengine5-dev nlohmann-json3-dev libmysqlclient-dev libgl2ps-dev \
+            liblzma-dev libxxhash-dev liblz4-dev libzstd-dev libcurl4-openssl-dev
+          pip install cmake-format
+
+      - name: Build and install Geant4
+        if: steps.cache-geant.outputs.cache-hit != 'true'
+        run: |
+          if [ -f "${G4_INSTALL}/bin/geant4.sh" ]; then
+            echo "Geant4 install found in cache"
+            exit 0
+          fi
+
+          cmake -S geant4 -B geant4/build \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX="${G4_INSTALL}" \
+            -DGEANT4_USE_SYSTEM_EXPAT=ON \
+            -DGEANT4_USE_SYSTEM_ZLIB=ON \
+            -DGEANT4_INSTALL_DATA=ON \
+            -DGEANT4_USE_GDML=OFF \
+            -DGEANT4_USE_QT=OFF
+          cmake --build geant4/build --parallel "$(nproc)"
+          cmake --install geant4/build
+
+      - name: Download and install CERN ROOT
+        if: steps.cache-root.outputs.cache-hit != 'true'
+        run: |
+          if [ -f "${ROOT_INSTALL}/bin/thisroot.sh" ]; then
+            echo "ROOT install found in cache"
+            exit 0
+          fi
+
+          wget -O root.tar.gz "${ROOT_LINK}"
+          tar -xzf root.tar.gz
+          mv root "${ROOT_INSTALL}"
+
 
       - name: Build and install COLA
         working-directory: COLA
@@ -41,17 +115,17 @@ jobs:
           sudo cmake --install build/release
 
       - name: Build and test CGlauber
+        working-directory: CGlauber
         run: |
+          source "${G4_INSTALL}/bin/geant4.sh"
+          source "${ROOT_INSTALL}/bin/thisroot.sh"
           export CMAKE_BUILD_PARALLEL_LEVEL="$(nproc)"
           cmake --workflow release-test
 
-      - name: Clang-tidy
-        id: clang-tidy
-        run: |
-          export CMAKE_BUILD_PARALLEL_LEVEL="$(nproc)"
-          cmake --workflow test
-
       - name: Check formatting
+        working-directory: CGlauber
         id: check-format
-        if: always()
-        run: cmake --workflow check-format
+        run: |
+          source "${G4_INSTALL}/bin/geant4.sh"
+          source "${ROOT_INSTALL}/bin/thisroot.sh"
+          cmake --workflow format-check

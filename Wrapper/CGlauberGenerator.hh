@@ -23,6 +23,8 @@
 #include "FermiMomentum.hh"
 #include "TGlauberMC.hh"
 
+#include <EventData.hh>
+
 #include <memory>
 #include <string>
 
