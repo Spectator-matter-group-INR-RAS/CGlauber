@@ -1,4 +1,5 @@
 # CGlauber
+[![CI](https://github.com/Spectator-matter-group-INR-RAS/CGlauber/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/Spectator-matter-group-INR-RAS/CGlauber/actions/workflows/ci.yml)
 ## COLA module wrap around TGlauberMC model
 
 Configurable parameters:
